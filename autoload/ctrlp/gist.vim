@@ -2,6 +2,7 @@ if exists('g:loaded_ctrlp_gist') && g:loaded_ctrlp_gist
   finish
 endif
 let g:loaded_ctrlp_gist = 1
+let s:system = function(get(g:, 'webapi#system_function', 'system'))
 
 let s:gist_var = {
 \  'init':   'ctrlp#gist#init()',
@@ -36,15 +37,16 @@ endfunction
 
 function! ctrlp#gist#init()
   let s:list = gist#list("mine")
-  if s:list == []
+  if len(s:list) == 0
     if !exists('g:github_user')
-      let s:system = function(get(g:, 'webapi#system_function', 'system'))
-      let g:github_user = substitute(s:system('git config --get github.user'), "\n", '', '')
-      if strlen(g:github_user) == 0
-        let g:github_user = $GITHUB_USER
+      let user = substitute(s:system('git config --get github.user'), "\n", '', '')
+      if strlen(user) == 0
+        let user = $GITHUB_USER
       end
+    else
+      let user = g:github_user
     endif
-    let s:list = gist#list(g:github_user)
+    let s:list = gist#list(user)
   endif
   return map(filter(s:list, '!empty(v:val.files)'), 's:format_gist(v:val)')
 endfunc
