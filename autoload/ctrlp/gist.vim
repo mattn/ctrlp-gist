@@ -36,6 +36,16 @@ endfunction
 
 function! ctrlp#gist#init()
   let s:list = gist#list("mine")
+  if s:list == []
+    if !exists('g:github_user')
+      let s:system = function(get(g:, 'webapi#system_function', 'system'))
+      let g:github_user = substitute(s:system('git config --get github.user'), "\n", '', '')
+      if strlen(g:github_user) == 0
+        let g:github_user = $GITHUB_USER
+      end
+    endif
+    let s:list = gist#list(g:github_user)
+  endif
   return map(filter(s:list, '!empty(v:val.files)'), 's:format_gist(v:val)')
 endfunc
 
