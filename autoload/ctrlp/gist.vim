@@ -30,7 +30,7 @@ function! s:format_gist(gist)
     let code = file.content
     let code = "\n".join(map(split(code, "\n"), '"  ".v:val'), "\n")
   else
-    let code = ""
+    let code = join(files, ' ')
   endif
   return printf("%s %s%s", a:gist.id, type(a:gist.description)==0?"": a:gist.description, code)
 endfunction
